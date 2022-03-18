@@ -1,0 +1,22 @@
+{
+  "name": "blood_donors",
+  "version": "1.0.0",
+  "description": "blood donors scraping",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/murali-cse/blood_donors.git"
+  },
+  "author": "murali",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/murali-cse/blood_donors/issues"
+  },
+  "homepage": "https://github.com/murali-cse/blood_donors#readme",
+  "dependencies": {
+    "puppeteer": "^13.5.1"
+  }
+}
