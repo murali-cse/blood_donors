@@ -4,7 +4,8 @@
   "description": "blood donors scraping",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js"
   },
   "repository": {
     "type": "git",
@@ -17,6 +18,8 @@
   },
   "homepage": "https://github.com/murali-cse/blood_donors#readme",
   "dependencies": {
-    "puppeteer": "^13.5.1"
+    "cheerio": "^1.0.0-rc.10",
+    "puppeteer": "^13.5.1",
+    "requirejs": "^2.3.6"
   }
 }
