@@ -1,5 +1,7 @@
 const puppeteer = require("puppeteer");
 const cheerio = require("cheerio");
+const file = require("fs");
+const { Console } = require("console");
 
 // donor details url
 const donorDetail = "http://bloodhelpers.com/blood-donor-info.php?id=";
@@ -7,32 +9,49 @@ const donorDetail = "http://bloodhelpers.com/blood-donor-info.php?id=";
 // blood helper
 // a1 positive blood donors list
 const a1_positive =
-  "http://bloodhelpers.com/search-blood-donor.php?location=433&bloodGroup=9&pageNo=1";
+  "http://bloodhelpers.com/search-blood-donor.php?location=433&bloodGroup=9&pageNo=";
 
-(async () => {
+console.log('Scrapping Process Initiated');
+console.log('....')
+console.log('Please wait ...');
+initiate();
+console.log('Scrapping Process Completed');
+process.setMaxListeners(0)
+
+async function initiate() {
+  var pageCount = 1;
   const browser = await puppeteer.launch();
   const page = await browser.newPage();
-  await page.goto(a1_positive);
-  let src = await page.content();
-  let $ = cheerio.load(src);
-  var donor_list = [];
-  let table = $(".tint-box");
-  let row = table.find("tr");
-  row.each(async (i, e) => {
-    if (i != 0) {
-      let cols = $(e).find("td");
-      
-      let link = cols[5].children[1].attribs.onclick;
-      let detail = await getDonorDetail(getIdFromUrl(link));
-      donor_list.push(detail)
-      // console.log(donor_list)
-    }
-  })
+  for (var itr = 1; itr <= pageCount; itr++) {
+    await page.goto(a1_positive +''+itr);
 
-    console.log(donor_list);
+    let src = await page.content();
+    let $ = cheerio.load(src);
+    
+    let pageCounts = $(".pages").children();
+    pageCount = $(pageCounts[pageCounts.length - 2]).text();
+    
+    let table = $(".tint-box");
+    let row = table.find("tr");
 
+    row.each(async (i, e) => {
+      if (i != 0) {
+        let cols = $(e).find("td");
+
+        let link = cols[5].children[1].attribs.onclick;
+        let detail = await getDonorDetail(getIdFromUrl(link));
+
+        detail.map((val, i) => {
+          if (detail.length - 1 == i)
+            file.writeFileSync("donors_list.csv", val + "\n", { flag: "a" });
+          else file.writeFileSync("donors_list.csv", val + ",", { flag: "a" });
+        });
+      }
+    });
+  }
+  
   await browser.close();
-})();
+}
 
 output = async (row) => {};
 
@@ -62,7 +81,8 @@ getPhoneNumberFromBase64 = (base64) => {
   return phn.substring(0, 10);
 };
 
-getDonorDetail = async (id) => {
+async function getDonorDetail(id) {
+  
   const browser = await puppeteer.launch();
   const page = await browser.newPage();
   await page.goto(donorDetail + id);
@@ -84,6 +104,7 @@ getDonorDetail = async (id) => {
       val = getTxtFromUrl(cols[1].children[0].attribs.src);
     } else {
       val = cols[1].children[0].data;
+    
     }
 
     donor_detail.push(val);
